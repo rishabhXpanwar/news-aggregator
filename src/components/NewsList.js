@@ -3,6 +3,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import './NewsList.css';
 import { toast } from 'react-toastify';
 
+const API_KEY = 'bf74998ee1cd5acf5ca6bd1340b02d27';
+
 const NewsList = ({ searchQuery, category }) => {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
@@ -28,25 +30,20 @@ const NewsList = ({ searchQuery, category }) => {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      let url = '';
-      if (category === 'trending') {
-        url = `https://newsapi.org/v2/everything?q=trending OR breaking OR hot&pageSize=10&page=${page}&apiKey=fa388a9ff06449739d474d2a39abe500`;
-      } else {
-        url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&page=${page}&category=${category}&q=${searchQuery}&apiKey=fa388a9ff06449739d474d2a39abe500`;
-      }
-
+      const query = searchQuery || category || 'latest';
+      const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&apikey=${API_KEY}&page=${page}`;
       const res = await fetch(url);
       const data = await res.json();
 
-      if (Array.isArray(data.articles)) {
-        setArticles(prev => [...prev, ...data.articles]);
-      } else {
+      if (!data.articles) {
         toast.error("No articles found or API limit exceeded.");
-        console.warn("Unexpected API response:", data);
+        return;
       }
+
+      setArticles(prev => [...prev, ...data.articles]);
     } catch (error) {
       console.error("Error fetching news:", error);
-      toast.error("Failed to fetch news. Please try again later.");
+      toast.error("Failed to fetch news.");
     } finally {
       setLoading(false);
     }
@@ -68,7 +65,6 @@ const NewsList = ({ searchQuery, category }) => {
       : [...bookmarks, article];
     setBookmarks(updated);
     localStorage.setItem('bookmarked', JSON.stringify(updated));
-
     toast.success(exists ? 'Removed from bookmarks!' : 'Bookmarked!');
   };
 
