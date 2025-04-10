@@ -1,0 +1,19 @@
+/* Example global dark styles */
+body.dark,
+.home-container.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark .news-card {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.dark-mode-btn {
+  background: none;
+  color: inherit;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+}
